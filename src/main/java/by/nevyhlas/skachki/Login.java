@@ -5,8 +5,8 @@ import java.io.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
-@WebServlet(name = "helloServlet", value = "/hello-servlet")
-public class HelloServlet extends HttpServlet {
+@WebServlet(name = "login", value = "/login")
+public class Login extends HttpServlet {
     private String message;
 
     public void init() {
@@ -30,6 +30,8 @@ public class HelloServlet extends HttpServlet {
         out.println("<label for=\"password\">Password:</label>");
         out.println("<input type=\"password\" id=\"password\" name=\"password\"><br><br>");
         out.println("<input type=\"submit\" value=\"Submit\">");
+        //add a link from right to register page
+        out.println("<a href=\"register\" style=\"float: right;\">Register</a>");
         out.println("</form>");
         out.println("</div>");
 
