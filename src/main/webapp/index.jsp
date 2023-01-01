@@ -6,16 +6,9 @@
     <title>Skachki</title>
 </head>
 
-<body>
+<meta http-equiv = "refresh" content = "0; url = main" />
 
 
-
-<h1><%= "Skachki" %>
-</h1>
-<br/>
-<a href="login">login</a>
-<br/>
-<a href="register">registration</a>
 
 
 </body>
