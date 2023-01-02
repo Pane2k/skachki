@@ -35,6 +35,10 @@ public class LogoutServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
+
+        //delete cookie named "username"
+        session.removeAttribute("username");
+
         session.invalidate();
         response.sendRedirect("/");
     }

@@ -12,6 +12,9 @@ public class MainServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+
+
+
         PrintWriter out = response.getWriter();
 
         response.setContentType("text/html");
@@ -32,6 +35,7 @@ public class MainServlet extends HttpServlet {
         }
         else {
             out.println("<a href=\"logout\">Logout</a>");
+            out.println("<a href=\"balance\">Balance</a>");
         }
         out.println("</body>");
         out.println("</html>");
@@ -43,5 +47,21 @@ public class MainServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+    }
+
+
+    protected void userCookieLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //get cookie named "username"
+        Cookie[] cookies = request.getCookies();
+        String username = null;
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("username")) {
+                username = cookie.getValue();
+            }
+        }
+        //if cookie is not null, set session attribute "username" to cookie value
+        if (username != null) {
+            request.getSession().setAttribute("username", username);
+        }
     }
 }

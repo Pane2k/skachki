@@ -92,7 +92,22 @@ public class LoginServlet extends HttpServlet {
                 //set session attribute
                 session.setAttribute("username", username);
                 //redirect to profile
-                response.sendRedirect("main");
+
+
+
+                //add cookie for remember me
+                Cookie ck = new Cookie("username", username);
+                //set cookie max age
+                ck.setMaxAge(60 * 60 * 24 * 30);
+                //add cookie to response
+                response.addCookie(ck);
+
+
+
+
+
+
+                response.sendRedirect("/main");
             } else {
                 //if user does not exist
                 //redirect to login and add error message

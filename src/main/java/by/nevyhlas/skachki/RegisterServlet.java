@@ -52,6 +52,38 @@ public class RegisterServlet extends HttpServlet {
         String password = request.getParameter("password");
         String email = request.getParameter("email");
 
+        //if username or password or email is empty, redirect to register page with error=NotFullFilledInfo
+
+        if(username == "" || password == "" || email == ""){
+            response.sendRedirect("register?error=NotFullFilledInfo");
+        }
+
+        //check if username and email is already taken in database
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            //connect to database
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/skachki", "root", "1234");;
+            Statement statement = connection.createStatement();
+
+            //check if username or email is already taken
+            System.out.println("trying to find user");
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM user WHERE username = '" + username + "' OR email = '" + email + "'");
+            if (resultSet.next()) {
+                response.sendRedirect("register?error=UsernameOrEmailTaken");
+            }
+            else {
+                //add user to database
+                System.out.println("trying to add user");
+
+                statement.executeUpdate("INSERT INTO user (username, password, email) VALUES ('" + username + "', '" + password + "', '" + email + "')");
+                response.sendRedirect("login");
+            }
+
+
+        }
+        catch (Exception throwable) {
+            throwable.printStackTrace();
+        }
 
 
     }
