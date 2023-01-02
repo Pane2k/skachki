@@ -1,10 +1,7 @@
 package by.nevyhlas.skachki;
 
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -38,6 +35,24 @@ public class LogoutServlet extends HttpServlet {
 
         //delete cookie named "username"
         session.removeAttribute("username");
+        //delete cookie
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("username")) {
+                cookie.setValue(null);
+                cookie.setMaxAge(0);
+                response.addCookie(cookie);
+            }
+            //delete cookie named "SESSIONID"
+            if (cookie.getName().equals("SESSIONID")) {
+                cookie.setValue(null);
+                cookie.setMaxAge(0);
+                response.addCookie(cookie);
+            }
+        }
+
+
+
 
         session.invalidate();
         response.sendRedirect("/");

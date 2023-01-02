@@ -26,7 +26,37 @@ public class RegisterServlet extends HttpServlet {
         out.println("<html><body>");
 
 
+
         out.println("<div style=\"position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);\">");
+
+        //if error=1, show error message
+        String error = request.getParameter("error");
+        if (error == null) {
+
+        }
+
+        else {
+            String errormassage = "";
+            switch (error) {
+                case "AuthError":
+                    errormassage = "<h3>Wrong username or password</h3>";
+                    break;
+                case "BanError":
+                    errormassage = "<h3>You are banned</h3>";
+                    break;
+                case "UsernameOrEmailTaken":
+                    errormassage = "<h3>Username or email is already taken</h3>";
+                    break;
+                case "NotFullFilledInfo":
+                    errormassage = "<h3>Enter all data to register</h3>";
+                    break;
+                default:
+                    errormassage = "<h3></h3>";
+            }
+
+            out.println(errormassage);
+        }
+
         out.println("<h1>" + message + "</h1>");
         out.println("<form action=\"register\" method=\"post\">");
         out.println("<label for=\"username\">Username:</label>");
@@ -45,6 +75,7 @@ public class RegisterServlet extends HttpServlet {
         out.println("</body></html>");
     }
 
+
     //get strings from form
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -53,9 +84,11 @@ public class RegisterServlet extends HttpServlet {
         String email = request.getParameter("email");
 
         //if username or password or email is empty, redirect to register page with error=NotFullFilledInfo
-
         if(username == "" || password == "" || email == ""){
             response.sendRedirect("register?error=NotFullFilledInfo");
+        }
+        if(!username.matches("[a-zA-Z0-9]+") || !password.matches("[a-zA-Z0-9]+") || !email.matches("[a-zA-Z0-9@.+]+")){
+            response.sendRedirect("register?error=AuthError");
         }
 
         //check if username and email is already taken in database

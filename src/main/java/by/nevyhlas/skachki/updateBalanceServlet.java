@@ -11,33 +11,19 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-@WebServlet(name = "BalanceServlet", value = "/balance")
-public class BalanceServlet extends HttpServlet {
+@WebServlet(name = "updateBalanceServlet", value = "/updateBalance")
+public class updateBalanceServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-
-        //if user is not logged in
+        //make balance update form
         if (request.getSession().getAttribute("username") == null) {
             response.sendRedirect("/login");
             return;
         }
 
-        //get username
-        Cookie[] cookies = request.getCookies();
-        //get username from cookie
-
-        //find username in cookies
         String username = (String) request.getSession().getAttribute("username");
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("username")) {
-                username = cookie.getValue();
-            }
-        }
 
-
-        int balance = getBalance(username);
-        
         PrintWriter out = response.getWriter();
 
         response.setContentType("text/html");
@@ -52,15 +38,18 @@ public class BalanceServlet extends HttpServlet {
 
         out.println("<body>");
         out.println("<h1>Skachki</h1>");
-        out.println("<h2>Balance</h2>");
+        out.println("<h2>Update balance</h2>");
+        out.println("<form action=\"updateBalance\" method=\"post\">");
+        //cant be null
 
-        out.println("<a href=\"updateBalance\">Update balance</a>");
-
-        out.println("<p>Balance: " + balance + "</p>");
+        out.println("<p>Balance: <input type=\"number\" name=\"balance\" min=\"0\" required></p>");
+        out.println("<input type=\"submit\" value=\"Submit\">");
+        out.println("</form>");
         out.println("<a href=\"main\">Main</a>");
         out.println("</body>");
 
         out.println("</html>");
+
 
 
 
@@ -69,31 +58,40 @@ public class BalanceServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+        //get username
+        String username = (String) request.getSession().getAttribute("username");
+
+
+        //get balance
+        int balance = Integer.parseInt(request.getParameter("balance"));
+
+
+        //update balance
+        updateBalance(username, balance);
+        response.sendRedirect("/balance");
     }
 
-    protected int getBalance(String username) {
-        try{
+    private void updateBalance(String username, int balance) {
+        try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/skachki", "root", "1234");;
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/skachki", "root", "1234");
             Statement statement = connection.createStatement();
 
-            //get balance from database
+            //get current balance
+            int currentBalance = 0;
             ResultSet resultSet = statement.executeQuery("SELECT balance FROM wallet WHERE userID = (SELECT userID FROM user WHERE username = '" + username + "')");
-            if(resultSet.next()) {
-                return resultSet.getInt("balance");
-            }
-            else {
-                //make new wallet with 0 balance and copy userID from user table
-                statement.executeUpdate("INSERT INTO wallet (balance, userID) VALUES (0, (SELECT userID FROM user WHERE username = '" + username + "'))");
-                return 0;
 
+            if (resultSet.next()) {
+                currentBalance = resultSet.getInt("balance");
             }
 
-        }
-        catch (Exception e) {
+
+            statement.executeUpdate("UPDATE wallet SET balance = " + (balance + currentBalance) + " WHERE userID = (SELECT userID FROM user WHERE username = '" + username + "')");
+
+
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return 0;
     }
 }

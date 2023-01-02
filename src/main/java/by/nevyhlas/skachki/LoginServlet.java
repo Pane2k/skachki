@@ -72,54 +72,35 @@ public class LoginServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-
-
-        //sql connection
         try {
-            //load driver
             Class.forName("com.mysql.cj.jdbc.Driver");
-            //create connection
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/skachki", "root", "1234");
-            //create statement
             Statement stmt = conn.createStatement();
-            //execute query
             ResultSet rs = stmt.executeQuery("select * from user where username = '" + username + "' and password = '" + password + "'");
-            //process result
+
             if (rs.next()) {
-                //if user exists
-                //create session
                 HttpSession session = request.getSession();
-                //set session attribute
                 session.setAttribute("username", username);
-                //redirect to profile
-
-
-
-                //add cookie for remember me
                 Cookie ck = new Cookie("username", username);
-                //set cookie max age
                 ck.setMaxAge(60 * 60 * 24 * 30);
-                //add cookie to response
                 response.addCookie(ck);
 
 
+                Cookie cookie = new Cookie("SESSIONID", session.getId());
+                cookie.setMaxAge(Integer.MAX_VALUE);
+                response.addCookie(cookie);
 
+                String cookieValue = session.getId();
 
-
+                stmt.executeUpdate("UPDATE user SET JSESSIONID = '" + cookieValue + "' WHERE username = '" + username + "'");
 
                 response.sendRedirect("/main");
             } else {
-                //if user does not exist
-                //redirect to login and add error message
                 response.sendRedirect("login?error=AuthError");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-
-
     }
 
 
